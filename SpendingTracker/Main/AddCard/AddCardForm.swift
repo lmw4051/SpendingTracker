@@ -8,6 +8,30 @@
 import SwiftUI
 
 struct AddCardForm: View {
+  let card: Card?
+  
+  init(card: Card? = nil) {
+    self.card = card
+    
+    _name = State(initialValue: self.card?.name ?? "")
+    _cardNumber = State(initialValue: self.card?.number ?? "")
+    
+    _cardType = State(initialValue: self.card?.type ?? "Visa")
+    
+    if let limit = card?.limit {
+        _limit = State(initialValue: String(limit))
+    }
+    
+    _month = State(initialValue: Int(self.card?.expMonth ?? 1))
+    _year = State(initialValue: Int(self.card?.expYear ?? Int16(currentYear)))
+    
+    if let data = self.card?.color,
+       let uiColor = UIColor.color(data: data) {
+        let c = Color(uiColor)
+        _color = State(initialValue: c)
+    }
+  }
+  
   @Environment(\.presentationMode) var presentationMode
   
   @State private var name = ""
@@ -58,7 +82,7 @@ struct AddCardForm: View {
           ColorPicker("Color", selection: $color)
         }
       }
-      .navigationTitle("Add Credit Card")
+      .navigationTitle(self.card != nil ? self.card?.name ?? "" : "Add Credit Card")
       .navigationBarItems(
         leading: cancelButton,
         trailing: saveButton
@@ -69,7 +93,7 @@ struct AddCardForm: View {
   private var saveButton: some View {
     Button {
       let viewContext = PersistenceController.shared.container.viewContext
-      let card = Card(context: viewContext)
+      let card = self.card != nil ? self.card! : Card(context: viewContext)
       
       card.name = self.name
       card.number = self.cardNumber
