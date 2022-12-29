@@ -19,14 +19,18 @@ struct MainView: View {
   )
   private var cards: FetchedResults<Card>
   
+  @State private var cardSelectionIndex = 0
+  
   var body: some View {
     NavigationView {
       ScrollView {
         if !cards.isEmpty {
-          TabView {
-            ForEach(cards) { card in
+          TabView(selection: $cardSelectionIndex) {
+            ForEach(0 ..< cards.count) { index in
+              let card = cards[index]
               CreditCardView(card: card)
                 .padding(.bottom, 50)
+                .tag(index)
             }
           }
           .tabViewStyle(
@@ -41,7 +45,17 @@ struct MainView: View {
             )
           )
           
-          TransactionsListView()
+          if let selectedCard = cards[cardSelectionIndex] {
+            Text(selectedCard.name ?? "")
+            TransactionsListView(card: selectedCard)
+          }
+          
+//          TabView {
+//            ForEach(cards) { card in
+//              CreditCardView(card: card)
+//                .padding(.bottom, 50)
+//            }
+//          }
         } else {
           emptyPromptMessage
         }
