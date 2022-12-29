@@ -57,7 +57,19 @@ struct AddTransactionForm: View {
   
   private var saveButton: some View {
     Button {
+      let context = PersistenceController.shared.container.viewContext
+      let transaction = CardTransaction(context: context)
+      transaction.name = self.name
+      transaction.timestamp = self.date
+      transaction.amount = Float(self.amount) ?? 0
+      transaction.photoData = self.photoData
       
+      do {
+        try context.save()
+        presentationMode.wrappedValue.dismiss()
+      } catch let customError {
+        print("Failed to save transaction: \(customError)")
+      }
     } label: {
       Text("Save")
     }    
