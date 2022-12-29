@@ -9,9 +9,14 @@ import SwiftUI
 
 struct AddCardForm: View {
   let card: Card?
-  
-  init(card: Card? = nil) {
+  var didAddCard: ((Card) ->())? = nil
+
+  init(
+    card: Card? = nil,
+    didAddCard: ((Card) ->())? = nil
+  ) {
     self.card = card
+    self.didAddCard = didAddCard
     
     _name = State(initialValue: self.card?.name ?? "")
     _cardNumber = State(initialValue: self.card?.number ?? "")
@@ -19,16 +24,15 @@ struct AddCardForm: View {
     _cardType = State(initialValue: self.card?.type ?? "Visa")
     
     if let limit = card?.limit {
-        _limit = State(initialValue: String(limit))
+      _limit = State(initialValue: String(limit))
     }
     
     _month = State(initialValue: Int(self.card?.expMonth ?? 1))
     _year = State(initialValue: Int(self.card?.expYear ?? Int16(currentYear)))
     
-    if let data = self.card?.color,
-       let uiColor = UIColor.color(data: data) {
-        let c = Color(uiColor)
-        _color = State(initialValue: c)
+    if let data = self.card?.color, let uiColor = UIColor.color(data: data) {
+      let c = Color(uiColor)
+      _color = State(initialValue: c)
     }
   }
   

@@ -19,18 +19,17 @@ struct MainView: View {
   )
   private var cards: FetchedResults<Card>
   
-  @State private var cardSelectionIndex = 0
-  
+  @State private var selectedCardHash = -1
+
   var body: some View {
     NavigationView {
       ScrollView {
         if !cards.isEmpty {
-          TabView(selection: $cardSelectionIndex) {
-            ForEach(0 ..< cards.count) { index in
-              let card = cards[index]
+          TabView(selection: $selectedCardHash) {
+            ForEach(cards) { card in
               CreditCardView(card: card)
                 .padding(.bottom, 50)
-                .tag(index)
+                .tag(card.hash)
             }
           }
           .tabViewStyle(
@@ -44,36 +43,32 @@ struct MainView: View {
               backgroundDisplayMode: .always
             )
           )
-          
-          if let selectedCard = cards[cardSelectionIndex] {
-            Text(selectedCard.name ?? "")
-            TransactionsListView(card: selectedCard)
+          .onAppear {
+            self.selectedCardHash = cards.first?.hash ?? -1
           }
           
-//          TabView {
-//            ForEach(cards) { card in
-//              CreditCardView(card: card)
-//                .padding(.bottom, 50)
-//            }
-//          }
+          if let firstIndex = cards.firstIndex(
+            where: { $0.hash == selectedCardHash }
+          ) {
+            let card = self.cards[firstIndex]
+            TransactionsListView(card: card)
+          }
         } else {
           emptyPromptMessage
         }
         
         Spacer()
           .fullScreenCover(
-            isPresented: $shouldPresentAddCardForm, onDismiss: nil) {
-              AddCardForm()
+            isPresented: $shouldPresentAddCardForm,
+            onDismiss: nil
+          ) {
+            AddCardForm(card: nil) { card in
+              self.selectedCardHash = card.hash
             }
+          }
       }
       .navigationTitle("Credit Cards")
-      .navigationBarItems(
-        leading: HStack {
-          addItemButton
-          deleteAllButton
-        },
-        trailing: addCardButton
-      )
+      .navigationBarItems(trailing: addCardButton)
     }
   }
   
@@ -93,41 +88,8 @@ struct MainView: View {
       .padding(EdgeInsets(top: 10, leading: 14, bottom: 10, trailing: 14))
       .background(Color(.label))
       .cornerRadius(5)
-      
-    }.font(.system(size: 22, weight: .semibold))
-  }
-  
-  var addItemButton: some View {
-    Button {
-      withAnimation {
-        let viewContext = PersistenceController.shared.container.viewContext
-        let card = Card(context: viewContext)
-        card.timestamp = Date()
-        
-        do {
-          try viewContext.save()
-        } catch {
-          
-        }
-      }
-    } label: {
-      Text("Add Item")
     }
-  }
-  
-  private var deleteAllButton: some View {
-    Button {
-      cards.forEach { card in
-        viewContext.delete(card)
-      }
-      do {
-        try viewContext.save()
-      } catch {
-        
-      }
-    } label: {
-      Text("Delete All")
-    }
+    .font(.system(size: 22, weight: .semibold))
   }
   
   var addCardButton: some View {
