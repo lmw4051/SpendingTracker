@@ -86,6 +86,7 @@ struct AddTransactionForm: View {
       transaction.photoData = self.photoData
       
       transaction.card = self.card
+      transaction.categories = self.selectedCategories as NSSet
       
       do {
         try context.save()
