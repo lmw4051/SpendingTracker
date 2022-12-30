@@ -15,9 +15,10 @@ struct AddTransactionForm: View {
   @State private var name = ""
   @State private var amount = ""
   @State private var date = Date()
+  @State private var photoData: Data?
   
   @State private var shouldPresentPhotoPicker = false
-  @State private var photoData: Data?
+  @State private var selectedCategories = Set<TransactionCategory>()
 
   var body: some View {
     NavigationView {
@@ -25,24 +26,31 @@ struct AddTransactionForm: View {
         Section(header: Text("Information")) {
           TextField("Name", text: $name)
           TextField("Amount", text: $amount)
-          DatePicker(
-            "Date",
-            selection: $date,
-            displayedComponents: .date
-          )
+          DatePicker("Date", selection: $date, displayedComponents: .date)
         }
         
         Section(header: Text("Categories")) {
-          NavigationLink(
-            destination:
-              CategoriesListView()
-                .navigationTitle("Categories")
-                .environment(
-                  \.managedObjectContext,
-                   PersistenceController.shared.container.viewContext
-                )
+          NavigationLink(destination: CategoriesListView(selectedCategories: $selectedCategories).navigationTitle("Categories")
+            .environment(\.managedObjectContext, PersistenceController.shared.container.viewContext)
           ) {
             Text("Select categories")
+          }
+          
+          let sortedByTimestampCategories = Array(selectedCategories)
+            .sorted(
+              by: { $0.timestamp?.compare($1.timestamp ?? Date()) == .orderedDescending }
+            )
+          
+          ForEach(sortedByTimestampCategories) { category in
+            HStack(spacing: 12) {
+              if let data = category.colorData, let uiColor = UIColor.color(data: data) {
+                let color = Color(uiColor)
+                Spacer()
+                  .frame(width: 30, height: 10)
+                  .background(color)
+              }
+              Text(category.name ?? "")
+            }
           }
         }
         
@@ -62,8 +70,9 @@ struct AddTransactionForm: View {
               .scaledToFill()
           }
         }
-      }.navigationTitle("Add Transaction")
-        .navigationBarItems(leading: cancelButton, trailing: saveButton)
+      }
+      .navigationTitle("Add Transaction")
+      .navigationBarItems(leading: cancelButton, trailing: saveButton)
     }
   }
   
