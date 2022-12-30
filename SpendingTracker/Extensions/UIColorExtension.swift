@@ -15,3 +15,7 @@ extension UIColor {
     return try? NSKeyedArchiver.archivedData(withRootObject: self, requiringSecureCoding: false)
   }
 }
+
+extension Color {
+  static let cardTransactionBackground = Color("cardTransactionBackground")
+}
