@@ -17,6 +17,9 @@
 		6337BB18295CB854004EBBAE /* AddCardForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6337BB17295CB854004EBBAE /* AddCardForm.swift */; };
 		6337BB1F295D7CAA004EBBAE /* AddTransactionForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6337BB1E295D7CAA004EBBAE /* AddTransactionForm.swift */; };
 		6337BB25295DFCEF004EBBAE /* TransactionsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6337BB24295DFCEF004EBBAE /* TransactionsListView.swift */; };
+		6337BB27295EBFC6004EBBAE /* CategoriesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6337BB26295EBFC6004EBBAE /* CategoriesListView.swift */; };
+		6337BB2E295EC42D004EBBAE /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6337BB2D295EC42D004EBBAE /* UIImageExtension.swift */; };
+		6337BB30295EC45D004EBBAE /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6337BB2F295EC45D004EBBAE /* UIColorExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +34,9 @@
 		6337BB17295CB854004EBBAE /* AddCardForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCardForm.swift; sourceTree = "<group>"; };
 		6337BB1E295D7CAA004EBBAE /* AddTransactionForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionForm.swift; sourceTree = "<group>"; };
 		6337BB24295DFCEF004EBBAE /* TransactionsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsListView.swift; sourceTree = "<group>"; };
+		6337BB26295EBFC6004EBBAE /* CategoriesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesListView.swift; sourceTree = "<group>"; };
+		6337BB2D295EC42D004EBBAE /* UIImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
+		6337BB2F295EC45D004EBBAE /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +69,7 @@
 		6337BAFF295CA6A8004EBBAE /* SpendingTracker */ = {
 			isa = PBXGroup;
 			children = (
+				6337BB2C295EC40C004EBBAE /* Extensions */,
 				6337BB13295CA7CF004EBBAE /* Main */,
 				6337BB00295CA6A8004EBBAE /* SpendingTrackerApp.swift */,
 				6337BB02295CA6A8004EBBAE /* ContentView.swift */,
@@ -105,8 +112,18 @@
 			children = (
 				6337BB1E295D7CAA004EBBAE /* AddTransactionForm.swift */,
 				6337BB24295DFCEF004EBBAE /* TransactionsListView.swift */,
+				6337BB26295EBFC6004EBBAE /* CategoriesListView.swift */,
 			);
 			path = Transaction;
+			sourceTree = "<group>";
+		};
+		6337BB2C295EC40C004EBBAE /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				6337BB2D295EC42D004EBBAE /* UIImageExtension.swift */,
+				6337BB2F295EC45D004EBBAE /* UIColorExtension.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -182,9 +199,12 @@
 				6337BB0D295CA6A9004EBBAE /* SpendingTracker.xcdatamodeld in Sources */,
 				6337BB18295CB854004EBBAE /* AddCardForm.swift in Sources */,
 				6337BB0A295CA6A9004EBBAE /* Persistence.swift in Sources */,
+				6337BB2E295EC42D004EBBAE /* UIImageExtension.swift in Sources */,
 				6337BB1F295D7CAA004EBBAE /* AddTransactionForm.swift in Sources */,
 				6337BB03295CA6A8004EBBAE /* ContentView.swift in Sources */,
+				6337BB27295EBFC6004EBBAE /* CategoriesListView.swift in Sources */,
 				6337BB25295DFCEF004EBBAE /* TransactionsListView.swift in Sources */,
+				6337BB30295EC45D004EBBAE /* UIColorExtension.swift in Sources */,
 				6337BB15295CA7D9004EBBAE /* MainView.swift in Sources */,
 				6337BB01295CA6A8004EBBAE /* SpendingTrackerApp.swift in Sources */,
 			);
