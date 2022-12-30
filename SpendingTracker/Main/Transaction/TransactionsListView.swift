@@ -50,20 +50,40 @@ struct TransactionsListView: View {
           addTransactionButton
           filterButton
             .sheet(isPresented: $shouldShowFilterSheet) {
-              FilterSheet { categories in
-                
+              FilterSheet(selectedCategories: self.selectedCategories) { categories in
+                self.selectedCategories = categories
               }
             }
-        }
-        .padding(.horizontal)
+        }.padding(.horizontal)
         
-        ForEach(fetchRequest.wrappedValue) { transaction in
+        ForEach(filterTransactions(selectedCategories: self.selectedCategories)) { transaction in
           CardTransactionView(transaction: transaction)
         }
       }
     }
     .fullScreenCover(isPresented: $shouldShowAddTransactionForm) {
       AddTransactionForm(card: self.card)
+    }
+  }
+  
+  @State var selectedCategories = Set<TransactionCategory>()
+  
+  private func filterTransactions(selectedCategories: Set<TransactionCategory>) -> [CardTransaction] {
+    if selectedCategories.isEmpty {
+      return Array(fetchRequest.wrappedValue)
+    }
+    
+    return fetchRequest.wrappedValue.filter { transaction in
+      var shouldKeep = false
+      
+      if let categories = transaction.categories as? Set<TransactionCategory> {
+        categories.forEach({ category in
+          if selectedCategories.contains(category) {
+            shouldKeep = true
+          }
+        })
+      }
+      return shouldKeep
     }
   }
   
@@ -82,6 +102,7 @@ struct TransactionsListView: View {
       .background(Color(.label))
       .cornerRadius(5)
     }
+    
   }
   
   private var addTransactionButton: some View {
@@ -96,21 +117,23 @@ struct TransactionsListView: View {
         .background(Color(.label))
         .cornerRadius(5)
     }
+    
   }
 }
 
 struct FilterSheet: View {
+  
+  @State var selectedCategories: Set<TransactionCategory>
   let didSaveFilters: (Set<TransactionCategory>) -> ()
   
   @Environment(\.managedObjectContext) private var viewContext
-  @Environment(\.presentationMode) var presentationMode
-
+  
   @FetchRequest(
     sortDescriptors: [NSSortDescriptor(keyPath: \TransactionCategory.timestamp, ascending: false)],
     animation: .default)
   private var categories: FetchedResults<TransactionCategory>
   
-  @State var selectedCategories = Set<TransactionCategory>()
+  //    @State var selectedCategories = Set<TransactionCategory>()
   
   var body: some View {
     NavigationView {
@@ -122,16 +145,17 @@ struct FilterSheet: View {
             } else {
               selectedCategories.insert(category)
             }
+            
           } label: {
             HStack(spacing: 12) {
-              if let data = category.colorData,
-                 let uiColor = UIColor.color(data: data) {
+              if let data = category.colorData, let uiColor = UIColor.color(data: data) {
                 let color = Color(uiColor)
                 Spacer()
                   .frame(width: 30, height: 10)
                   .background(color)
               }
               Text(category.name ?? "")
+              
                 .foregroundColor(Color(.label))
               Spacer()
               
@@ -141,12 +165,13 @@ struct FilterSheet: View {
             }
           }
         }
-      }
-      .navigationTitle("Select filters")
-      .navigationBarItems(trailing: saveButton)
+      }.navigationTitle("Select filters")
+        .navigationBarItems(trailing: saveButton)
     }
   }
-    
+  
+  @Environment(\.presentationMode) var presentationMode
+  
   private var saveButton: some View {
     Button {
       didSaveFilters(selectedCategories)
@@ -154,10 +179,12 @@ struct FilterSheet: View {
     } label: {
       Text("Save")
     }
+    
   }
 }
 
 struct CardTransactionView: View {
+  
   let transaction: CardTransaction
   
   private let dateFormatter: DateFormatter = {
@@ -173,7 +200,9 @@ struct CardTransactionView: View {
     withAnimation {
       do {
         let context = PersistenceController.shared.container.viewContext
+        
         context.delete(transaction)
+        
         try context.save()
       } catch {
         print("Failed to delete transaction: ", error)
@@ -187,10 +216,10 @@ struct CardTransactionView: View {
         VStack(alignment: .leading) {
           Text(transaction.name ?? "")
             .font(.headline)
-          
           if let date = transaction.timestamp {
             Text(dateFormatter.string(from: date))
           }
+          
         }
         Spacer()
         
@@ -200,36 +229,27 @@ struct CardTransactionView: View {
           } label: {
             Image(systemName: "ellipsis")
               .font(.system(size: 24))
-          }
-          .padding(EdgeInsets(top: 6, leading: 8, bottom: 4, trailing: 0))
+          }.padding(EdgeInsets(top: 6, leading: 8, bottom: 4, trailing: 0))
             .actionSheet(isPresented: $shouldPresentActionSheet) {
-              .init(
-                title: Text(transaction.name ?? ""),
-                message: nil,
-                buttons: [
-                  .destructive(Text("Delete"), action: handleDelete),
-                  .cancel()
-                ]
-              )
+              .init(title: Text(transaction.name ?? ""), message: nil, buttons: [
+                .destructive(Text("Delete"), action: handleDelete),
+                .cancel()
+              ])
             }
           
-          Text(String(format: "$%.2f", transaction.amount))
+          Text(String(format: "$%.2f", transaction.amount ))
         }
+        
+        
       }
       
       if let categories = transaction.categories as? Set<TransactionCategory> {
-        let sortedByTimestampCategories = Array(categories)
-          .sorted(
-            by: {
-              $0.timestamp?.compare($1.timestamp ?? Date()) == .orderedDescending
-            }
-          )
+        let sortedByTimestampCategories = Array(categories).sorted(by: {$0.timestamp?.compare($1.timestamp ?? Date()) == .orderedDescending })
         
         HStack {
           ForEach(sortedByTimestampCategories) { category in
             HStack {
-              if let data = category.colorData,
-                 let uiColor = UIColor.color(data: data) {
+              if let data = category.colorData, let uiColor = UIColor.color(data: data) {
                 let color = Color(uiColor)
                 Text(category.name ?? "")
                   .font(.system(size: 16, weight: .semibold))
@@ -239,18 +259,22 @@ struct CardTransactionView: View {
                   .foregroundColor(.white)
                   .cornerRadius(5)
               }
+              
+              
             }
+            
           }
           Spacer()
         }
+        
       }
       
-      if let photoData = transaction.photoData,
-         let uiImage = UIImage(data: photoData) {
+      if let photoData = transaction.photoData, let uiImage = UIImage(data: photoData) {
         Image(uiImage: uiImage)
           .resizable()
           .scaledToFill()
       }
+      
     }
     .foregroundColor(Color(.label))
     .padding()
@@ -271,12 +295,13 @@ struct TransactionsListView_Previews: PreviewProvider {
   
   static var previews: some View {
     let context = PersistenceController.shared.container.viewContext
-    
     ScrollView {
       if let card = firstCard {
         TransactionsListView(card: card)
       }
+      
     }
+    
     .environment(\.managedObjectContext, context)
   }
 }
