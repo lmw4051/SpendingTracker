@@ -9,17 +9,17 @@ import SwiftUI
 
 struct CategoriesListView: View {
   @Binding var selectedCategories: Set<TransactionCategory>
-
+  
   @State private var name = ""
   @State private var color = Color.red
   
   @Environment(\.managedObjectContext) private var viewContext
-
-  @FetchRequest(
-      sortDescriptors: [NSSortDescriptor(keyPath: \TransactionCategory.timestamp, ascending: false)],
-      animation: .default)
-  private var categories: FetchedResults<TransactionCategory>
   
+  @FetchRequest(
+    sortDescriptors: [NSSortDescriptor(keyPath: \TransactionCategory.timestamp, ascending: false)],
+    animation: .default)
+  private var categories: FetchedResults<TransactionCategory>
+    
   var body: some View {
     Form {
       Section(header: Text("Select a category")) {
@@ -30,10 +30,10 @@ struct CategoriesListView: View {
             } else {
               selectedCategories.insert(category)
             }
-            
           } label: {
             HStack(spacing: 12) {
-              if let data = category.colorData, let uiColor = UIColor.color(data: data) {
+              if let data = category.colorData,
+                 let uiColor = UIColor.color(data: data) {
                 let color = Color(uiColor)
                 Spacer()
                   .frame(width: 30, height: 10)
@@ -50,10 +50,10 @@ struct CategoriesListView: View {
           }
         }
         .onDelete { indexSet in
-          indexSet.forEach { index in
-            let category = categories[index]
+          indexSet.forEach { i in
+            let category = categories[i]
             selectedCategories.remove(category)
-            viewContext.delete(categories[index])
+            viewContext.delete(category)
           }
           try? viewContext.save()
         }
